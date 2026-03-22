@@ -43,6 +43,6 @@ Before ending a session, update `Session Status.md` with what was done, what cha
 | 3. Wireframes | Not Started |
 | 4. Claude.md | In Progress |
 | 5. Product Backlog | Not Started |
-| 6. Session Status | Not Started |
+| 6. Session Status | In Progress |
 
 **Next step:** Review the user stories in the PRD, then fill in System Overview and Data Sources & APIs sections.
