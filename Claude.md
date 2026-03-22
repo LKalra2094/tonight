@@ -7,7 +7,7 @@
 
 ## Role Context
 
-Tonight is an AI-powered evening planning app for SF. The user is the sole PM and builder.
+Tonight is an AI-powered evening planning web app for SF. The user is the sole PM and builder.
 
 ## Project Location Rule
 
@@ -22,7 +22,7 @@ All files stay inside the `tonight/` folder.
 
 ## Session Handoff Protocol
 
-Before ending a session, update `Session Status.md` with what was done, what changed, next steps, and key decisions.
+Before ending a session, update `Session Status.md` with what was done, next steps, and key decisions.
 
 ## Sprints
 
@@ -31,18 +31,3 @@ Before ending a session, update `Session Status.md` with what was done, what cha
 ## Reference
 
 - **Product Backlog**: `Product Backlog.md` (not yet created)
-
-## Current Status
-
-**Phase 1 (Foundation) progress:**
-
-| Step | Status |
-|------|--------|
-| 1. Product Brief | Closed |
-| 2. Product Requirements Document | In Progress |
-| 3. Wireframes | Not Started |
-| 4. Claude.md | In Progress |
-| 5. Product Backlog | Not Started |
-| 6. Session Status | In Progress |
-
-**Next step:** Review the user stories in the PRD, then fill in System Overview and Data Sources & APIs sections.
