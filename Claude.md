@@ -24,14 +24,13 @@ All files stay inside the `tonight/` folder.
 
 Before ending a session, update `Session Status.md` with what was done, what changed, next steps, and key decisions.
 
-## Iterations
+## Sprints
 
 *None yet — still in Phase 1 (Foundation).*
 
 ## Reference
 
-- **Backlog**: `Backlog.md` (not yet created)
-- **Changelog**: `Changelog.md` (not yet created)
+- **Product Backlog**: `Product Backlog.md` (not yet created)
 
 ## Current Status
 
@@ -43,8 +42,7 @@ Before ending a session, update `Session Status.md` with what was done, what cha
 | 2. Product Requirements Document | In Progress |
 | 3. Wireframes | Not Started |
 | 4. Claude.md | In Progress |
-| 5. Backlog | Not Started |
-| 6. Changelog | Not Started |
-| 7. Session Status | Not Started |
+| 5. Product Backlog | Not Started |
+| 6. Session Status | Not Started |
 
 **Next step:** Review the user stories in the PRD, then fill in System Overview and Data Sources & APIs sections.
