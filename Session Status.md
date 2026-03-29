@@ -6,7 +6,7 @@
 
 ## Where We Left Off
 
-PRD user stories and acceptance criteria are complete for all phases (1-8), History, and Settings. All user stories cleaned to pure intent (no implementation details). AC added for every phase. Still in Phase 1 (Foundation) — PRD needs System Overview and Data Sources sections, then Product Backlog.
+PRD user stories and acceptance criteria are complete for all phases (1-8), History, and Settings. Session protocols (start/end) formalized in root CLAUDE.md and referenced from project CLAUDE.md. Still in Phase 1 (Foundation) — PRD needs System Overview and Data Sources sections, then Product Backlog.
 
 ### Next Steps
 
@@ -20,6 +20,7 @@ PRD user stories and acceptance criteria are complete for all phases (1-8), Hist
 - US-3 split into US-3a (age) and US-3b (gender) — separate concerns
 - Saved addresses (US-53) moved to Settings, not Onboarding
 - US-8 (natural language input) is the primary input; all quick-set fields are optional
+- US-11 reframed as "group type" not "who I'm going with"
 - US-13 is a preference (when you want to head out), not availability — calendar (US-22) handles availability
 - US-13 default: 6pm if before 6pm, else 1 hour from now
 - US-18 vibe: preset options only, no free text
@@ -32,3 +33,4 @@ PRD user stories and acceptance criteria are complete for all phases (1-8), Hist
 - No official Resy API available — will need alternatives (OpenTable, Google Places, or link out)
 - PRD structure: user stories are pure intent, all specifics live in acceptance criteria
 - Doc structure discussion: phases should be top-level sections (h2), User Stories and AC as h3 peers — not yet restructured
+- Session protocols formalized: start (read CLAUDE.md → Session Status → check worktree → read task files) and end (update Session Status → commit → push)
