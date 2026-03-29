@@ -26,8 +26,8 @@ Follow the Start/End of Session protocols defined in the root CLAUDE.md.
 
 ## Sprints
 
-*None yet — still in Phase 1 (Foundation).*
+*Foundation complete. No sprints started yet.*
 
 ## Reference
 
-- **Product Backlog**: `Product Backlog.md` (not yet created)
+- **Product Backlog**: `Product Backlog.md`

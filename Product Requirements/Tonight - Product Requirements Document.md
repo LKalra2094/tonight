@@ -349,10 +349,11 @@ flowchart LR
 
 ### User Stories
 
-| ID    | Story                                                                                                    |
-| ----- | -------------------------------------------------------------------------------------------------------- |
+| ID    | Story                                                                                              |
+| ----- | -------------------------------------------------------------------------------------------------- |
 | US-39 | As a user, I can browse and select from alternative dining/bar options or swap any stop in my plan       |
 | US-40 | As a user, I can go back to the plan cards and pick a different one without re-running discovery         |
+| US-41 | As a user, I can change the travel mode between stops so the plan reflects how I actually get around    |
 
 ### Acceptance Criteria
 
@@ -371,18 +372,19 @@ flowchart LR
 - No undo — user can select a different card at any time to replace their choice
 - If none of the 5 options work, a "Show more options" action regenerates a new set with optional guidance ("cheaper", "closer", "different cuisine")
 
-*Activity and event stops:*
-- Each stop has a "Swap" action
-- Swapping regenerates only that stop — all other stops, times, and travel remain intact
-- User can specify what they want different ("cheaper", "closer", "different genre") or just request an alternative
-- Swapped stop respects the same time slot and travel constraints as the original
-- If no viable alternatives exist, system says so rather than forcing a bad option
-
 **US-40 — Back to plan cards**
 - "See other plans" button available from the plan detail view
 - Returns to the 3 plan cards from Phase 3 with all cards still available
 - Previously viewed plan is marked so the user knows which one they already explored
 - No new API calls — uses the same generated plans
+
+**US-41 — Travel mode override**
+- Each travel segment between stops shows a travel mode selector
+- Options: Walk, Bike, Rideshare, Transit (MUNI/BART)
+- Default is the system's auto-pick from US-34 (walk if under 15 min, rideshare otherwise)
+- Changing travel mode recalculates: travel time, cost estimate, and departure time for that segment
+- Travel mode is per-segment — user can walk to dinner and rideshare to the show
+- If a mode is impractical (e.g., walking 45 minutes), system shows the time but does not block the choice
 
 ## Phase 6: Commit
 
@@ -390,31 +392,31 @@ flowchart LR
 
 | ID    | Story                                                                                          |
 | ----- | ---------------------------------------------------------------------------------------------- |
-| US-41 | As a user, I get a "what to wear" recommendation based on weather and venue dress code         |
-| US-42 | As a user, I can see vibe information for each venue                                           |
-| US-43 | As a user, I can save my plan to Google Calendar so it's on my schedule                        |
-| US-44 | As a user, my committed plan is saved to history so I can revisit it later                     |
+| US-42 | As a user, I get a "what to wear" recommendation based on weather and venue dress code         |
+| US-43 | As a user, I can see vibe information for each venue                                           |
+| US-44 | As a user, I can save my plan to Google Calendar so it's on my schedule                        |
+| US-45 | As a user, my committed plan is saved to history so I can revisit it later                     |
 
 ### Acceptance Criteria
 
-**US-41 — What to wear**
+**US-42 — What to wear**
 - Single unified recommendation combining weather forecast and venue dress code
 - Shows current weather conditions (temp, rain probability) as supporting context
 - Recommendation is gender-aware based on US-4
 - Reflects the final venue selections after Refine
 
-**US-42 — Vibe**
+**US-43 — Vibe**
 - Each venue shows a short vibe description sourced from reviews and community posts
 - If data is sparse, show "No vibe info available" rather than guessing
-- Dress code is stored as venue data but displayed via US-41 (what to wear), not repeated here
+- Dress code is stored as venue data but displayed via US-42 (what to wear), not repeated here
 
-**US-43 — Save to Google Calendar**
+**US-44 — Save to Google Calendar**
 - Creates one calendar event per stop with: venue name as title, address in location field, cost and notes in description, departure reminder before each stop
 - Uses the Google OAuth granted at sign-up (US-1)
 - Shows a success confirmation with a link to view in Google Calendar
 - If calendar write fails, shows error and lets user retry
 
-**US-44 — Save to history**
+**US-45 — Save to history**
 - Plan is automatically saved to history when committed — no extra action needed
 - Saved plan includes: all stops, venues, times, costs, weather, what-to-wear recommendation, and the original input
 - Plan is saved even if the Google Calendar sync fails
@@ -425,25 +427,25 @@ flowchart LR
 
 | ID    | Story                                                                                                  |
 | ----- | ------------------------------------------------------------------------------------------------------ |
-| US-45 | As a user, I can share my plan as a formatted link so friends know where I'll be                       |
-| US-46 | As a user, I can share a visual plan card to social platforms so I can post my evening plans            |
-| US-47 | As a user, I can invite friends directly to my plan so they can see the full itinerary                 |
+| US-46 | As a user, I can share my plan as a formatted link so friends know where I'll be                       |
+| US-47 | As a user, I can share a visual plan card to social platforms so I can post my evening plans            |
+| US-48 | As a user, I can invite friends directly to my plan so they can see the full itinerary                 |
 
 ### Acceptance Criteria
 
-**US-45 — Share as link**
+**US-46 — Share as link**
 - Generates a shareable URL that opens a read-only view of the plan
 - Link shows: all stops, venues, times, and embedded map — no login required to view
 - Share action triggers the native OS share sheet (text, iMessage, WhatsApp, etc.)
 - Link does not expire
 
-**US-46 — Visual plan card for social**
+**US-47 — Visual plan card for social**
 - Generates a styled image (card) summarizing the plan: evening title, stops, neighborhoods, vibe
 - Image is sized for Instagram Stories (9:16) and general sharing (1:1)
 - User can save the image to camera roll or share directly via share sheet
 - No personal data (budget, cost breakdown) on the shareable image
 
-**US-47 — Invite friends**
+**US-48 — Invite friends**
 - User can invite via link or directly by entering a phone number / email
 - Invitees receive a link showing the full itinerary with venues, times, and embedded map
 - Invitees do not need a Tonight account to view the plan
@@ -455,26 +457,26 @@ flowchart LR
 
 | ID    | Story                                                                                                      |
 | ----- | ---------------------------------------------------------------------------------------------------------- |
-| US-48 | As a user who went out, I get a next-day prompt to rate each stop so the app learns what I enjoyed          |
-| US-49 | As a user who went out, I can flag vibe mismatches so the system improves its recommendations               |
-| US-50 | As a user who didn't go out, I get a prompt asking what happened so the app adjusts accordingly             |
+| US-49 | As a user who went out, I get a next-day prompt to rate each stop so the app learns what I enjoyed          |
+| US-50 | As a user who went out, I can flag vibe mismatches so the system improves its recommendations               |
+| US-51 | As a user who didn't go out, I get a prompt asking what happened so the app adjusts accordingly             |
 
 ### Acceptance Criteria
 
-**US-48 — Rate each stop**
+**US-49 — Rate each stop**
 - Next-day push notification prompts the user to rate their evening
 - Each stop gets a thumbs up / thumbs down rating
 - Optional free-text field per stop for additional notes
 - Ratings feed into the history-informed plan ranking (US-26)
 - User can skip rating entirely — it's never required
 
-**US-49 — Flag vibe mismatch**
+**US-50 — Flag vibe mismatch**
 - Per-stop option: "Vibe didn't match"
 - When flagged, user selects what was off: description, photos, dress code, crowd, noise level
 - Flags are tracked per venue and per source — used to improve source reliability scoring over time
 - Flagging is separate from the thumbs up/down rating — a user can enjoy a venue but still flag a misleading description
 
-**US-50 — Didn't go out prompt**
+**US-51 — Didn't go out prompt**
 - Softer notification tone/copy than the went-out prompt
 - Options: Plans changed, Too expensive, Too far, Weather, Didn't feel like it, Other
 - Single-select, not multi-select — captures the primary reason
@@ -487,18 +489,18 @@ flowchart LR
 
 | ID    | Story                                                                                          |
 | ----- | ---------------------------------------------------------------------------------------------- |
-| US-51 | As a user, I can browse all my past committed plans and their details                          |
-| US-52 | As a user, I can re-run a past plan for a new date with updated event availability             |
+| US-52 | As a user, I can browse all my past committed plans and their details                          |
+| US-53 | As a user, I can re-run a past plan for a new date with updated event availability             |
 
 ### Acceptance Criteria
 
-**US-51 — Browse past plans**
+**US-52 — Browse past plans**
 - Plans listed in reverse chronological order
 - Each entry shows: date, anchor activity, neighborhood, total cost, and overall rating (if rated)
 - Tapping a plan opens the full detail view with all stops, venues, times, costs, and ratings
 - Plans that were committed but not rated show a "Rate this evening" prompt
 
-**US-52 — Re-run a past plan**
+**US-53 — Re-run a past plan**
 - "Do this again" button on any past plan
 - Opens Set the Scene pre-filled with the original input and preferences
 - Generates new plans using the same vibe/intent but with current event availability
@@ -510,16 +512,16 @@ flowchart LR
 
 | ID    | Story                                                                                                  |
 | ----- | ------------------------------------------------------------------------------------------------------ |
-| US-53 | As a user, I can update all my profile and preference settings at any time                              |
-| US-54 | As a user, I can save named addresses so I can quickly select them as starting locations                |
+| US-54 | As a user, I can update all my profile and preference settings at any time                              |
+| US-55 | As a user, I can save named addresses so I can quickly select them as starting locations                |
 
 ### Acceptance Criteria
 
-**US-53 — Settings management**
+**US-54 — Settings management**
 - All onboarding fields (location, age, gender, dietary, geographic zone, activities, cuisines) are editable
 - All quick-set field defaults and modes (US-22) are configurable here
 
-**US-54 — Saved addresses**
+**US-55 — Saved addresses**
 - User can save named addresses with a label (e.g., "Mom's house", "Gym") and an address via search or pin-on-map
 - No limit on number of saved addresses
 - Saved addresses appear as quick-select options in US-13 (starting location)
@@ -529,13 +531,97 @@ flowchart LR
 
 ## 4. System Overview
 
-*TBD*
+### Architecture
+
+Tonight is a two-service system: a React frontend and a Python backend.
+
+**Frontend — A Vite + React single-page app. Handles all UI rendering: plan cards, timeline, forms, carousels. Contains no business logic — it sends user input to the backend and displays what comes back. Deployed to Vercel.
+
+**Backend — A FastAPI (Python) server. Handles authentication, database operations, and the AI orchestration pipeline. This is where all logic lives: parsing user intent, calling external APIs, scoring and ranking options, and assembling plans. Deployed to Railway or Render.
+
+The frontend communicates with the backend over HTTPS. A single API call sends the user's input (text, budget, time, preferences) to the backend. The backend returns structured plan data that the frontend renders.
+
+### AI Orchestration Pipeline
+
+When a user submits a request, the backend runs a LangGraph pipeline with five steps:
+
+1. **Understand** — Parse the user's natural language input and structured fields into a query the system can act on.
+2. **Discover** — Call external APIs (event sources, restaurant/bar sources, weather, maps) to gather raw options.
+3. **Evaluate** — Score and rank options against the user's preferences, dietary restrictions, budget, location, and history.
+4. **Compose** — Build 3 complete evening plans, each with sequenced stops, travel segments, cost estimates, and timing.
+5. **Present** — Format the plans into structured JSON for the frontend to render.
+
+LangGraph is used as the orchestration framework. Claude is the LLM used for natural language understanding, plan narration, vibe summaries, and what-to-wear recommendations.
+
+### Data Model
+
+Data is stored in a PostgreSQL database (Supabase or Neon, free tier).
+
+**Core entities:**
+- **User** — profile, preferences, dietary restrictions, geographic zone, saved addresses
+- **Plan** — the generated evening plan: stops, venues, times, costs, weather snapshot, original input
+- **Stop** — a single venue/activity within a plan: venue reference, time slot, cost estimate, position in sequence
+- **Rating** — per-stop thumbs up/down, vibe mismatch flags, free-text notes
+- **Venue cache** — cached venue data from external APIs to reduce redundant calls
 
 ---
 
 ## 5. Data Sources & APIs
 
-*TBD*
+### Events
+
+| Source | Method | What it provides | Free tier |
+|---|---|---|---|
+| Eventbrite | API | Ticketed events: concerts, comedy, art, food events. Structured data with dates, prices, venues, categories | Yes (1000 calls/hr) |
+| 19hz | Scrape | SF electronic music and underground events. Community-curated, covers events Eventbrite misses | N/A (scraping) |
+| Lu.ma | Scrape | Tech, creative, and community events in SF. Strong for the young professional audience | N/A (scraping) |
+| Do The Bay | Scrape | Curated local picks: pop-ups, markets, nightlife, free events. Good for discovery | N/A (scraping) |
+| Serper | API | Google search results for events. Fallback when structured sources miss something | 2,500 queries/mo free |
+
+**Primary:** Eventbrite API for structured event data. **Secondary:** Scrape 19hz, Lu.ma, Do The Bay for SF-specific coverage. **Fallback:** Serper for gap-filling via Google search.
+
+### Restaurants & Bars
+
+| Source | Method | What it provides | Free tier |
+|---|---|---|---|
+| Google Places API | API | Venue details: name, address, rating, review count, price level, hours, photos | $200/mo credit (~$0 for MVP volume) |
+| Yelp Fusion API | API | Ratings, reviews, cuisine tags, price tier, photos. Stronger review content than Google | 5,000 calls/day free |
+
+**Primary:** Google Places for structured venue data, photos, and hours. **Secondary:** Yelp for richer review content and cuisine tagging. Use both to cross-reference ratings and fill gaps.
+
+### Travel & Logistics
+
+| Source | Method | What it provides | Free tier |
+|---|---|---|---|
+| Google Directions API | API | Travel time and distance between stops by mode (driving, walking, transit, bicycling) | $200/mo credit |
+| Google Maps Embed API | API | Embedded map views for venue cards (US-38) | Unlimited, free |
+
+**Cost estimation:** Uber/Lyft APIs require partnership access. Rideshare costs will be estimated using a formula based on distance and time from Google Directions (base fare + per-mile + per-minute), calibrated against known SF Uber pricing. Not precise, but good enough for budgeting.
+
+### Weather
+
+| Source | Method | What it provides | Free tier |
+|---|---|---|---|
+| OpenWeatherMap | API | Current conditions and hourly forecast: temperature, rain probability, wind, description | 1,000 calls/day free |
+
+One source is sufficient. Hourly forecast for the planned evening is all that's needed.
+
+### Photos
+
+| Source | Method | What it provides | Free tier |
+|---|---|---|---|
+| Google Places Photos | API | Venue interior/exterior photos referenced by place ID | Bundled with Places API credit |
+| Yelp Fusion | API | Venue photos via review content | Bundled with Yelp free tier |
+
+**Primary:** Google Places Photos. **Fallback:** Yelp photos if Google coverage is thin for a venue.
+
+### LLM
+
+| Source | Method | What it provides | Cost |
+|---|---|---|---|
+| Claude API (Anthropic) | API | Natural language understanding, plan narration, vibe summaries, what-to-wear recommendations | Pay per token |
+
+Claude is used in the Understand and Compose steps of the LangGraph pipeline. All other steps are deterministic code — no LLM calls for ranking, filtering, or cost estimation.
 
 ---
 

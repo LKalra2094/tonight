@@ -6,15 +6,17 @@
 
 ## Where We Left Off
 
-- PRD restructured: US IDs renumbered sequentially (US-1 through US-54), all phases use consistent heading format
-- Phase 4/5/6 reorganized: carousel moved to Phase 5 (Refine), what-to-wear and vibe moved to Phase 6 (Commit), US-40 merged into US-39
-- Anti-Sycophancy Protocol added to root CLAUDE.md
-- Root CLAUDE.md updated: all changes (including docs) now go through worktree + PR
+- Foundation phase complete: PRD, System Overview, Data Sources & APIs, Product Backlog all done
+- Added US-41 (travel mode override) to Phase 5 (Refine), renumbered US-41→US-55 across all phases
+- System Overview finalized: Vite + React frontend, FastAPI + LangGraph backend, PostgreSQL (Supabase/Neon)
+- Data Sources & APIs finalized: Eventbrite + scraped SF sources, Google Places + Yelp, Google Directions, OpenWeatherMap, Claude API
+- Product Backlog created: 55 items, prioritized P0/P1/P2
+- Architecture diagram created (tonight_architecture.png)
+- Project Claude.md updated to reflect foundation complete
+- User's key motivation: exploring agentic structure with LangChain/LangGraph — this drove the architecture decision (Python backend over all-TypeScript)
 
 ### Next Steps
 
-1. Review and confirm PRD Phase 4 onwards
-2. Fill in System Overview section of the PRD
-3. Fill in Data Sources & APIs section of the PRD
-4. Create Product Backlog from PRD
-5. Update project Claude.md to reflect completed foundation work
+1. Scope Sprint 1 — likely the core loop: Set the Scene → Browse Plans → Your Plan
+2. Create Sprint 1 folder with Technical Spec and Design Doc
+3. Begin building
