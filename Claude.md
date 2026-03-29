@@ -15,14 +15,14 @@ All files stay inside the `tonight/` folder.
 
 ## Context Reading Order
 
-1. `Session Status.md`
-2. `Claude.md` (this file)
+1. `CLAUDE.md` (this file)
+2. `Session Status.md`
 3. `Product Requirements/Tonight - Product Brief.md`
 4. `Product Requirements/Tonight - Product Requirements Document.md`
 
-## Session Handoff Protocol
+## Session Protocols
 
-Before ending a session, update `Session Status.md` with what was done, next steps, and key decisions.
+Follow the Start/End of Session protocols defined in the root CLAUDE.md.
 
 ## Sprints
 
