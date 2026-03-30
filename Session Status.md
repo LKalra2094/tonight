@@ -6,17 +6,26 @@
 
 ## Where We Left Off
 
-- Foundation phase complete: PRD, System Overview, Data Sources & APIs, Product Backlog all done
-- Added US-41 (travel mode override) to Phase 5 (Refine), renumbered US-41→US-55 across all phases
-- System Overview finalized: Vite + React frontend, FastAPI + LangGraph backend, PostgreSQL (Supabase/Neon)
-- Data Sources & APIs finalized: Eventbrite + scraped SF sources, Google Places + Yelp, Google Directions, OpenWeatherMap, Claude API
-- Product Backlog created: 55 items, prioritized P0/P1/P2
-- Architecture diagram created (tonight_architecture.png)
-- Project Claude.md updated to reflect foundation complete
-- User's key motivation: exploring agentic structure with LangChain/LangGraph — this drove the architecture decision (Python backend over all-TypeScript)
+- Sprint 1 complete and merged
+- Built: keyword search → Eventbrite (scraping) + Lu.ma (API) → event cards in 4-column grid
+- Eventbrite: scrape search page for event list, enrich with ticket_classes API for pricing
+- Lu.ma: public REST API, filter by keyword client-side, filter out sold out and online events
+- Frontend: search bar, clickable event cards (image, name, date, venue, price), price filter with presets, invite-only toggle
+- Discovered Eventbrite search API was deprecated in 2019 — pivoted to scraping
+- SerpApi explored but dropped (Google index too thin vs Eventbrite's own search)
+- Moved worktree convention from `.worktrees/` to `worktrees/` for Obsidian visibility
+- Updated root CLAUDE.md with new worktree path convention
+- `.env` lives at `Application/.env` (shared across frontend/backend)
+
+### Key Decisions
+
+- Eventbrite data via scraping `__SERVER_DATA__` JSON + ticket API (not their deprecated search API)
+- Lu.ma data via their undocumented public REST API
+- No SerpApi dependency — scraping gives better results
+- Price filtering done client-side (no re-fetch needed)
+- Events with unknown prices ("See listing") pass through price filter
 
 ### Next Steps
 
-1. Scope Sprint 1 — likely the core loop: Set the Scene → Browse Plans → Your Plan
-2. Create Sprint 1 folder with Technical Spec and Design Doc
-3. Begin building
+1. Scope Sprint 2
+2. Potential areas: more event sources (19hz, Do The Bay), better search, UI polish, neighborhood filtering
