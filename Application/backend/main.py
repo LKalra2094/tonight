@@ -7,7 +7,7 @@ from httpx import HTTPStatusError, RequestError
 
 from services.eventbrite import search_events
 
-load_dotenv()
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 EVENTBRITE_API_KEY = os.getenv("EVENTBRITE_API_KEY")
 if not EVENTBRITE_API_KEY:
