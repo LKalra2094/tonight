@@ -19,7 +19,8 @@ All files stay inside the `tonight/` folder.
 2. `Session Status.md`
 3. `Product Requirements/Tonight - Product Brief.md`
 4. `Product Requirements/Tonight - Product Requirements Document.md`
-5. Current sprint's `Technical Spec.md`
+5. Epic docs in `Epics/` for whichever epics are in play
+6. Current sprint's `Technical Spec.md`
 
 ## Session Protocols
 
@@ -33,4 +34,5 @@ Follow the Start/End of Session protocols defined in the root CLAUDE.md.
 
 ## Reference
 
-- **Product Backlog**: `Product Backlog.md`
+- **Product Backlog**: `Product Backlog.md` — tracks epics (high-level)
+- **Epic Docs**: `Epics/` — story breakdowns per epic (created as epics are picked up)
