@@ -19,6 +19,7 @@ All files stay inside the `tonight/` folder.
 2. `Session Status.md`
 3. `Product Requirements/Tonight - Product Brief.md`
 4. `Product Requirements/Tonight - Product Requirements Document.md`
+5. Current sprint's `Technical Spec.md`
 
 ## Session Protocols
 
@@ -26,7 +27,9 @@ Follow the Start/End of Session protocols defined in the root CLAUDE.md.
 
 ## Sprints
 
-*Foundation complete. No sprints started yet.*
+| Sprint | Focus | Status |
+|--------|-------|--------|
+| 1 | Basic event search (Eventbrite scraping + Lu.ma API) | Closed |
 
 ## Reference
 
