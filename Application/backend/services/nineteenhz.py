@@ -35,64 +35,100 @@ async def search_events(keyword: str) -> list[dict]:
     results = []
 
     for row in rows:
-        cells = row.find_all("td")
-        if len(cells) < 7:
-            continue
-
-        event = _parse_row(cells)
+        event = _parse_row(row)
         if not event:
             continue
 
         # Filter: SF only, future events, keyword match
-        if event["_city"].lower() != "san francisco" and event["_city"].lower() != "sf":
+        city = event.pop("_city", "").lower()
+        if city not in ("san francisco", "sf"):
             continue
         if event["end"] and event["end"] < now:
             continue
-        if not _matches_keyword(event, keyword_lower):
+        tags = event.pop("_tags", "")
+        if not _matches_keyword(event["name"], tags, keyword_lower):
             continue
 
-        # Remove internal fields
-        event.pop("_city", None)
-        event.pop("_tags", None)
         results.append(event)
 
     results.sort(key=lambda e: e["start"])
     return results
 
 
-def _parse_row(cells: list) -> dict | None:
-    """Parse a single table row into an event dict."""
+def _parse_row(row) -> dict | None:
+    """Parse a single table row into an event dict.
+
+    19hz's HTML is malformed — the first <td> often contains the content
+    of all subsequent cells baked into its innerHTML. We parse from the
+    raw row HTML instead of relying on clean <td> separation.
+    """
     try:
-        # Column 6: hidden sort date
-        sort_div = cells[6].find("div", class_="shrink")
-        if not sort_div:
+        row_html = row.decode_contents()
+
+        # Extract sort date from hidden div
+        sort_match = re.search(
+            r'<div class=["\']shrink["\']>(\d{4}/\d{2}/\d{2})</div>', row_html
+        )
+        if not sort_match:
             return None
-        sort_date = sort_div.get_text(strip=True)  # e.g., "2026/03/29"
+        sort_date = sort_match.group(1)
+        base_date = sort_date.replace("/", "-")
 
-        # Column 0: date and time range
-        date_text = cells[0].get_text(separator=" ", strip=True)
-        start_time, end_time = _parse_time_range(date_text, sort_date)
+        # Extract first <td> for date/time
+        first_cell = row.find("td")
+        if not first_cell:
+            return None
+        date_text = first_cell.get_text(separator=" ", strip=True)
+        start_time, end_time = _parse_time_range(date_text, base_date)
 
-        # Column 1: event title + venue
-        link = cells[1].find("a")
-        event_url = link["href"] if link else ""
-        event_name = link.get_text(strip=True) if link else ""
+        # Extract event link and name from first <a> tag in second cell area
+        # The first <a> after the first </td> is the event link
+        links = row.find_all("a")
+        event_url = ""
+        event_name = ""
+        if links:
+            event_url = links[0].get("href", "")
+            event_name = links[0].get_text(strip=True)
 
-        cell_text = cells[1].get_text(separator=" ", strip=True)
-        venue, city = _parse_venue_city(cell_text)
+        # Extract venue and city: pattern is "Event Name</a> @ Venue (City)"
+        # Look in the raw HTML after the closing </a> tag
+        venue = "Venue TBD"
+        city = ""
+        venue_match = re.search(
+            r"</a>\s*@\s*([^<]+?)(?:\(([^)]+)\))", row_html
+        )
+        if venue_match:
+            venue = venue_match.group(1).strip() or "Venue TBD"
+            city = venue_match.group(2).strip()
 
-        # Column 2: tags
-        tags = cells[2].get_text(strip=True)
+        # Extract tags from the second <td> content area
+        # Tags appear after the venue/city, in the next <td>
+        tags = ""
+        td_tags_match = re.search(
+            r"\((?:San Francisco|SF|Oakland|Berkeley|San Jose|Sacramento)[^)]*\)<td>([^<]*)</td>",
+            row_html,
+            re.IGNORECASE,
+        )
+        if td_tags_match:
+            tags = td_tags_match.group(1).strip()
 
-        # Column 3: price | age
-        price_age = cells[3].get_text(strip=True)
-        price_range = _parse_price(price_age)
+        # Extract price from the third <td> after the tags
+        price_range = "See listing"
+        # Find all <td> content after the event link area
+        td_contents = re.findall(r"<td>([^<]*)</td>", row_html)
+        if len(td_contents) >= 2:
+            tags = tags or td_contents[0].strip()
+            price_text = td_contents[1].strip()
+            price_range = _parse_price(price_text)
+        elif len(td_contents) >= 1 and not tags:
+            tags = td_contents[0].strip()
+
         is_free = price_range.lower() == "free"
 
         return {
             "id": f"19hz-{sort_date.replace('/', '')}-{hash(event_name) % 100000}",
             "name": event_name,
-            "summary": f"{tags}" if tags else "",
+            "summary": tags,
             "start": start_time,
             "end": end_time,
             "timezone": "America/Los_Angeles",
@@ -114,13 +150,13 @@ def _parse_row(cells: list) -> dict | None:
         return None
 
 
-def _parse_time_range(date_text: str, sort_date: str) -> tuple[str, str]:
+def _parse_time_range(date_text: str, base_date: str) -> tuple[str, str]:
     """Extract start and end ISO datetimes from date text and sort date."""
-    # sort_date is like "2026/03/29"
-    base_date = sort_date.replace("/", "-")
-
-    # Time range pattern like "(9pm-2am)" or "(2pm-6pm)"
-    time_match = re.search(r"\((\d{1,2}(?::\d{2})?\s*[ap]m)\s*-\s*(\d{1,2}(?::\d{2})?\s*[ap]m)\)", date_text, re.IGNORECASE)
+    time_match = re.search(
+        r"\((?:[A-Za-z]+:\s*)?(\d{1,2}(?::\d{2})?\s*[ap]m)\s*-\s*(\d{1,2}(?::\d{2})?\s*[ap]m)\)",
+        date_text,
+        re.IGNORECASE,
+    )
     if time_match:
         start_str = time_match.group(1).strip()
         end_str = time_match.group(2).strip()
@@ -144,35 +180,13 @@ def _parse_time(time_str: str) -> str:
         return "00:00:00"
 
 
-def _parse_venue_city(cell_text: str) -> tuple[str, str]:
-    """Extract venue and city from 'Event Name @ Venue (City)' text."""
-    # Split on @ to get venue part
-    parts = cell_text.split("@", 1)
-    if len(parts) < 2:
-        return "Venue TBD", ""
-
-    venue_part = parts[1].strip()
-
-    # Extract city from parentheses at end
-    city_match = re.search(r"\(([^)]+)\)\s*$", venue_part)
-    city = city_match.group(1).strip() if city_match else ""
-
-    # Venue is everything before the city parentheses
-    if city_match:
-        venue = venue_part[: city_match.start()].strip()
-    else:
-        venue = venue_part.strip()
-
-    return venue or "Venue TBD", city
-
-
-def _parse_price(price_age: str) -> str:
-    """Parse price from '20' or '$5 b4 10/$10' or 'free' or '$20-30 | 21+'."""
-    if not price_age:
+def _parse_price(price_text: str) -> str:
+    """Parse price from varied formats."""
+    if not price_text:
         return "See listing"
 
     # Split on pipe to separate price from age
-    price_part = price_age.split("|")[0].strip()
+    price_part = price_text.split("|")[0].strip()
 
     if not price_part:
         return "See listing"
@@ -196,8 +210,6 @@ def _parse_price(price_age: str) -> str:
     return f"${low:.0f} – ${high:.0f}"
 
 
-def _matches_keyword(event: dict, keyword: str) -> bool:
+def _matches_keyword(name: str, tags: str, keyword: str) -> bool:
     """Check if event name or tags contain the keyword."""
-    name = event.get("name", "").lower()
-    tags = event.get("_tags", "").lower()
-    return keyword in name or keyword in tags
+    return keyword in name.lower() or keyword in tags.lower()

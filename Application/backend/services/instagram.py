@@ -44,7 +44,7 @@ def _fetch_posts(client: ApifyClient) -> list[dict]:
     """Run the Apify Instagram Post Scraper and return all items."""
     run = client.actor(ACTOR_ID).call(
         run_input={
-            "usernames": INSTAGRAM_ACCOUNTS,
+            "username": INSTAGRAM_ACCOUNTS,
             "resultsLimit": 30,
         },
         timeout_secs=120,
