@@ -18,7 +18,7 @@ Make Tonight a genuinely useful SF event aggregator by adding four new event sou
 | 19hz | HTML table scrape | Electronic music, underground events, raves | None |
 | Do The Bay | JSON API (Accept header trick) | Curated local picks: pop-ups, markets, nightlife, free events | None |
 | Ticketmaster | Discovery API v2 | Concerts, sports, theater, large-venue events | API key (free, 5000 req/day) |
-| Instagram (8 accounts) | Apify Instagram Post Scraper | SF lifestyle/event posts from local creators and media | Apify API token (free tier, $5/mo credit) |
+| Instagram (7 accounts) | Apify Instagram Post Scraper | SF lifestyle/event posts from local creators and media | Apify API token (free tier, $5/mo credit) |
 
 ---
 
@@ -29,7 +29,7 @@ Make Tonight a genuinely useful SF event aggregator by adding four new event sou
 - 19hz scraper: fetch and parse the Bay Area event listing table
 - Do The Bay scraper: fetch events via JSON API for today/tomorrow/specific dates
 - Ticketmaster integration: search SF events by keyword via Discovery API
-- Instagram integration: pull recent posts from 8 accounts via Apify, extract event-like content
+- Instagram integration: pull recent posts from 7 accounts via Apify, extract event-like content
 - All new sources output the same unified event schema used by Eventbrite and Lu.ma
 - All sources called concurrently from the existing `/api/events` endpoint
 - Update `.env.example` with new keys
@@ -150,15 +150,14 @@ sort=date,asc
 
 **Accounts**:
 1. `@andrewtourssf`
-2. `@valinthebay_` (handle TBC)
-3. `@secret_sanfrancisco`
-4. `@onlyinsf`
-5. `@sfbaydiaries`
-6. `@sfgirl.chronicle`
-7. `@sfstandard`
-8. `@sfbucketlist`
+2. `@secret_sanfrancisco`
+3. `@onlyinsf`
+4. `@sfbaydiaries`
+5. `@sfgirl.chronicle`
+6. `@sfstandard`
+7. `@sfbucketlist`
 
-**Approach**: Use Apify's Instagram Post Scraper actor (`apify/instagram-post-scraper`) via the `apify-client` Python package. Fetch recent posts (last 30 days) from all 8 accounts. Extract caption, image URL, post date, and post URL.
+**Approach**: Use Apify's Instagram Post Scraper actor (`apify/instagram-post-scraper`) via the `apify-client` Python package. Fetch recent posts (last 30 days) from all 7 accounts. Extract caption, image URL, post date, and post URL.
 
 **Keyword matching**: Match keyword against caption text (case-insensitive substring). Instagram posts are not structured events — many will be food reviews, city photos, etc. Only posts whose captions match the keyword are returned.
 
@@ -191,14 +190,9 @@ run = client.actor("apify/instagram-post-scraper").call(
 items = client.dataset(run["defaultDatasetId"]).iterate_items()
 ```
 
-**Cost**: ~$0.10-0.50 per run at 8 accounts × 30 posts. Free tier ($5/mo) easily covers daily use.
+**Cost**: ~$0.10-0.50 per run at 7 accounts × 30 posts. Free tier ($5/mo) easily covers daily use.
 
-**Latency**: Apify runs take 30-60 seconds. This is too slow for a synchronous API call. Options:
-1. **Background refresh**: Cron job fetches Instagram data every few hours, stores in memory or file. The API endpoint reads from the cache. — *Preferred, but caching is out of scope for this sprint.*
-2. **Skip on timeout**: Call Apify with a 10-second timeout. If it doesn't return in time, skip Instagram results for that request. — *Simpler, but Instagram results would rarely appear.*
-3. **Pre-fetch on startup**: Fetch Instagram data when the server starts. Stale after a few hours but always available. — *Good MVP compromise.*
-
-**Decision**: Option 3 — pre-fetch on server startup. Store results in memory. Refresh manually by restarting the server. This keeps the architecture simple and avoids introducing caching infrastructure.
+**Latency**: Apify runs take 30-60 seconds. This is acceptable — the Instagram fetch runs concurrently alongside the other sources via `asyncio.gather()`. The overall response time will be dominated by the Apify call, but 30-60 seconds is fine for the MVP.
 
 **File**: `backend/services/instagram.py`
 
@@ -243,13 +237,13 @@ Source values: `"Eventbrite"`, `"Lu.ma"`, `"19hz"`, `"Do The Bay"`, `"Ticketmast
 | `backend/services/nineteenhz.py` | 19hz HTML table scraper |
 | `backend/services/dothebay.py` | Do The Bay JSON API client |
 | `backend/services/ticketmaster.py` | Ticketmaster Discovery API client |
-| `backend/services/instagram.py` | Apify Instagram Post Scraper client + startup pre-fetch |
+| `backend/services/instagram.py` | Apify Instagram Post Scraper client |
 
 ### Modified Files
 
 | File | Change |
 |------|--------|
-| `backend/main.py` | Import new services, add to `asyncio.gather()`, pre-fetch Instagram on startup |
+| `backend/main.py` | Import new services, add to `asyncio.gather()` |
 | `backend/requirements.txt` | Add `beautifulsoup4`, `apify-client` |
 | `Application/.env.example` | Add `TICKETMASTER_API_KEY`, `APIFY_TOKEN` |
 
@@ -284,6 +278,6 @@ Same pattern as Sprint 1: each source is called via `asyncio.gather(return_excep
 3. 19hz events include: name, date/time, venue, price, genre tags, and link to original listing
 4. Do The Bay events include: name, date/time, venue with address, price, image, and link
 5. Ticketmaster events include: name, date/time, venue with address, price range, image, and link
-6. Instagram results appear from pre-fetched data matching the keyword
+6. Instagram results appear from Apify data matching the keyword
 7. Failure of any single source does not break the endpoint — remaining sources still return
 8. No new secrets committed to git
