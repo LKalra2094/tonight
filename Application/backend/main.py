@@ -1,11 +1,12 @@
+import asyncio
 import os
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from httpx import HTTPStatusError, RequestError
 
-from services.eventbrite import search_events
+from services.eventbrite import search_events as eventbrite_search
+from services.luma import search_events as luma_search
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
 
@@ -26,15 +27,23 @@ app.add_middleware(
 @app.get("/api/events")
 async def get_events(q: str = Query(..., min_length=1, description="Search keyword")):
     try:
-        events = await search_events(EVENTBRITE_API_KEY, q)
-        return events
-    except HTTPStatusError as e:
-        raise HTTPException(
-            status_code=502,
-            detail=f"Eventbrite API error: {e.response.status_code}",
+        eb_results, luma_results = await asyncio.gather(
+            eventbrite_search(EVENTBRITE_API_KEY, q),
+            luma_search(q),
+            return_exceptions=True,
         )
-    except RequestError:
+
+        events = []
+        if isinstance(eb_results, list):
+            events.extend(eb_results)
+        if isinstance(luma_results, list):
+            events.extend(luma_results)
+
+        events.sort(key=lambda e: e["start"])
+        return events
+
+    except Exception:
         raise HTTPException(
             status_code=502,
-            detail="Could not reach Eventbrite API",
+            detail="Could not fetch events",
         )
